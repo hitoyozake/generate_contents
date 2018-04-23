@@ -4,6 +4,7 @@ import chainer.functions as F
 import chainer.links as L
 from chainer import training, datasets, iterators, optimizers
 from chainer.training import extensions
+from chainer.training.extensions import LogReport
 import numpy as np
 
 batch_size = 10
@@ -52,6 +53,8 @@ def main(use_device):
     trainer.extend(extensions.ProgressBar())
 
     # 教師データとテストデータの正解率の表示
+    #trainer.extend(extensions.LogReport())
+
     # trainer.extend(extensions.PrintReport(['main/accuracy', 'validation/main/accuracy']))
 
     trainer.run()
