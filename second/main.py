@@ -6,6 +6,7 @@ from chainer import training, datasets, iterators, optimizers
 from chainer.training import extensions
 from chainer.training.extensions import LogReport
 import numpy as np
+from chainer.backends import cuda
 
 from second.model import MNIST_Conv_MN
 
@@ -15,8 +16,13 @@ batch_size = 10
 def main(use_device):
     model = MNIST_Conv_MN()
 
+
     if use_device >= 1:
         print("use gpu")
+        cuda.get_device_from_id(use_device).use()
+        model.to_gpu(use_device)
+
+
 
     train, test = chainer.datasets.get_mnist(ndim=3)
 
