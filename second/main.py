@@ -23,7 +23,6 @@ def main(use_device):
         model.to_gpu(use_device)
 
 
-
     train, test = chainer.datasets.get_mnist(ndim=3)
 
     # 繰り返し条件の作成
@@ -55,6 +54,9 @@ def main(use_device):
 
 
 import sys
+import os
+
+print(os.getcwd())
 
 if __name__ == '__main__':
     argv = sys.argv
