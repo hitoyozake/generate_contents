@@ -5,7 +5,7 @@ import chainer.links as L
 from chainer import training, datasets, iterators, optimizers
 from chainer.training import extensions
 from chainer.training.extensions import LogReport
-import numpy as np
+import cupy as cp
 from chainer.backends import cuda
 
 from second.model import MNIST_Conv_MN
@@ -19,8 +19,8 @@ def main(use_device):
 
     if use_device >= 1:
         print("use gpu")
-        cuda.get_device_from_id(use_device).use()
-        model.to_gpu(use_device)
+        cuda.get_device_from_id(0).use()
+        model.to_gpu(0)
 
 
     train, test = chainer.datasets.get_mnist(ndim=3)
@@ -32,11 +32,11 @@ def main(use_device):
     optimizer = optimizers.Adam()
     optimizer.setup(model)
 
-    updator=training.StandardUpdater(train_iter, optimizer)
+    updator=training.StandardUpdater(train_iter, optimizer, device=0)
     trainer = training.Trainer(updator, (5, 'epoch'), out="result")
 
     # テストをTrainerに設定
-    trainer.extend(extensions.Evaluator(test_iter, model))
+    trainer.extend(extensions.Evaluator(test_iter, model, device=0))
 
     # 学習の進展を表示するようにする
     trainer.extend(extensions.ProgressBar())
@@ -60,9 +60,9 @@ print(os.getcwd())
 
 if __name__ == '__main__':
     argv = sys.argv
-    use_device = 0
+    use_device = 1
     if len(argv) >= 2:
         if argv[1] == 1:
             print(argv[1])
-            use_device = 0
+            use_device = 1
     main(use_device)

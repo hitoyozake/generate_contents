@@ -6,6 +6,9 @@ from chainer import training, datasets, iterators, optimizers
 from chainer.training import extensions
 from chainer.training.extensions import LogReport
 import numpy as np
+import cupy as cp
+
+xp = cp
 
 class MNIST_Conv_MN(chainer.Chain):
 
