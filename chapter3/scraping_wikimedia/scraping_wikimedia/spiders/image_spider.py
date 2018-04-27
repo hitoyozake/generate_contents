@@ -4,6 +4,9 @@ import scrapy
 
 
 class WikimediaSpider(scrapy.Spider):
+    """
+       wikimediaの画像を集めてくるspider
+    """
     name = "WikimediaSpider"
 
     allow_domains = []
