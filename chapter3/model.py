@@ -42,6 +42,7 @@ class SuperResolutionModel(chainer.Chain):
             self.c7 = L.Convolution2D(12, 56, ksize=1, stride=1, pad=1, initialW=w4)
             self.l7 = L.PReLU()
 
+            # Deconvolugion2Dで解像度を高くする
             self.c8 = L.Deconvolution2D(56, 1, ksize=9, stride=3, pad=4, initialW=w5)
 
     def __call__(self, x, t=None, train=True):
