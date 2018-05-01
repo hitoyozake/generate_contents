@@ -4,6 +4,9 @@ import chapter3.model
 
 import os
 from PIL import Image
+from chainer import iterators
+from chainer import optimizers
+
 
 def make_train_data():
     files = os.listdir('train')
@@ -42,6 +45,25 @@ def main(use_device=0):
         import cuda
         cuda.get_device_from_id(0).use()
         model.to_gpu(0)
+
+    images = make_train_data()
+
+    train_iter = iterators.SerialIterator(dataset=images, batch_size=20, shuffle=True)
+
+    optimizer = optimizers.Adam()
+
+    optimizer.setup(model)
+
+    updater = chapter3.model.SRUpdater(train_iter=train_iter, optimizer=optimizer, device=use_device)
+
+    from chainer import training
+    trainer = training.Trainer(updater, (10000, 'epoch'), out='result')
+    from chainer.training import extensions
+    trainer.extend(extensions.ProgressBar())
+
+
+
+
 
 
 
