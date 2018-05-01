@@ -15,7 +15,7 @@ def make_train_data():
     train_imgs = []
 
     for fn in files:
-        img = Image.open('train/' + fn).resize((320, 320)).covert('YCbCr')
+        img = Image.open('train/' + fn).resize((320, 320)).convert('YCbCr')
 
         cur_x = 0
 
@@ -25,7 +25,7 @@ def make_train_data():
             while cur_y <= 320 - 40:
                 # 画像から切り出し
 
-                rect = (cur_x, cur_y, cure_x + 40, cur_y + 40)
+                rect = (cur_x, cur_y, cur_x + 40, cur_y + 40)
 
                 coping = img.crop(rect).copy()
 
@@ -90,9 +90,9 @@ def main(use_device=0):
 if __name__ == '__main__':
     import sys
 
-    use_device = 0
+    use_device = -1
 
     if len(sys.argv) >= 2:
         use_device = sys.argv[1]
-
+    print(use_device)
     main(use_device)

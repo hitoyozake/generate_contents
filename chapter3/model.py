@@ -27,7 +27,7 @@ class SuperResolutionModel(chainer.Chain):
             self.c2 = L.Convolution2D(56, 12, ksize=1, stride=1, pad=0, initialW=w2)
             self.l2 = L.PReLU()
 
-            self.c3 = L.Convolution2D(12, 12, ksize=3, stride=1, pad=0, initialW=w3)
+            self.c3 = L.Convolution2D(12, 12, ksize=3, stride=1, pad=1, initialW=w3)
             self.l3 = L.PReLU()
 
             self.c4 = L.Convolution2D(12, 12, ksize=3, stride=1, pad=1, initialW=w3)
@@ -42,10 +42,12 @@ class SuperResolutionModel(chainer.Chain):
             self.c7 = L.Convolution2D(12, 56, ksize=1, stride=1, pad=1, initialW=w4)
             self.l7 = L.PReLU()
 
-            self.c8 = L.Convolution2D(56, 1, ksize=9, stride=1, pad=1, initialW=w5)
+            self.c8 = L.Deconvolution2D(56, 1, ksize=9, stride=3, pad=4, initialW=w5)
 
     def __call__(self, x, t=None, train=True):
+
         h1 = self.l1(self.c1(x))
+
         h2 = self.l2(self.c2(h1))
         h3 = self.l3(self.c3(h2))
         h4 = self.l4(self.c4(h3))
@@ -65,7 +67,7 @@ class SRUpdater(training.StandardUpdater):
         super(SRUpdater, self).__init__(
             train_iter,
             optimizer,
-            devvice=device
+            device=device
         )
 
 
@@ -83,10 +85,10 @@ class SRUpdater(training.StandardUpdater):
 
             # YUV空間データのYを用いる
             hpix = xp.array(img, dtype=np.float32) / 255.0
-            y_batch.append(hpix[:, :, 0]) # Yのみの1chのデータにする
-            low = img.resize(16, 16, Image.NEAREST)
+            y_batch.append([hpix[:, :, 0]]) # Yのみの1chのデータにする
+            low = img.resize((16, 16), resample=Image.NEAREST)
             lpix = xp.array(low, dtype=np.float32) / 255.0
-            x_batch.append(lpix[:,:,0]) # Yのみの1chのデータにする
+            x_batch.append([lpix[:,:,0]]) # Yのみの1chのデータにする
 
 
         x, y = xp.array(x_batch, dtype=xp.float32), xp.array(y_batch, dtype=xp.float32)
