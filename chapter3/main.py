@@ -11,4 +11,4 @@ if __name__ == '__main__':
     if len(sys.argv) >= 2:
         use_device = sys.argv[1]
 
-    maih(use_device)
+    main(use_device)
