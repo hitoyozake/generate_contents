@@ -5,6 +5,10 @@ import chainer.functions as F
 import chainer.links as L
 import chainer
 from chainer import training
+import numpy as np
+from PIL import Image
+
+xp = np
 
 class SuperResolutionModel(chainer.Chain):
     def __init__(self):
@@ -73,6 +77,17 @@ class SRUpdater(training.StandardUpdater):
 
         x_batch = [] # 入力データ
         y_batch = [] # 出力データ
-        pass
+
+        for img in batch:
+            # 高解像度のデータ
+
+            # YUV空間データのYを用いる
+            hpix = xp.array(img, dtype=xp.float32) / 255.0
+            y_batch.append(hpix[:, :, 0]) # Yのみの1chのデータにする
+            low = img.resize(16, 16, Image.NEAREST)
+            lpix = xp.array(low, dtype=xp.float32) / 255.0
+            x_batch.append(lpix[:,:,0]) # Yのみの1chのデータにする
+
+
 
 
