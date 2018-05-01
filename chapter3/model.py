@@ -82,11 +82,19 @@ class SRUpdater(training.StandardUpdater):
             # 高解像度のデータ
 
             # YUV空間データのYを用いる
-            hpix = xp.array(img, dtype=xp.float32) / 255.0
+            hpix = xp.array(img, dtype=np.float32) / 255.0
             y_batch.append(hpix[:, :, 0]) # Yのみの1chのデータにする
             low = img.resize(16, 16, Image.NEAREST)
-            lpix = xp.array(low, dtype=xp.float32) / 255.0
+            lpix = xp.array(low, dtype=np.float32) / 255.0
             x_batch.append(lpix[:,:,0]) # Yのみの1chのデータにする
+
+
+        x, y = xp.array(x_batch, dtype=xp.float32), xp.array(y_batch, dtype=xp.float32)
+
+        optimizer.update(optimizer.target, x, y)
+
+
+
 
 
 

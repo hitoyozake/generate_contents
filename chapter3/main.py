@@ -1,7 +1,12 @@
 # -* encoding: utf-8 *-
 
+import chapter3.model
+
 def main(use_device=0):
     print("main chapter3")
+
+
+
 
 if __name__ == '__main__':
     import sys
