@@ -6,6 +6,7 @@ import os
 from PIL import Image
 from chainer import iterators
 from chainer import optimizers
+import chainer
 
 
 def make_train_data():
@@ -60,6 +61,24 @@ def main(use_device=0):
     trainer = training.Trainer(updater, (10000, 'epoch'), out='result')
     from chainer.training import extensions
     trainer.extend(extensions.ProgressBar())
+
+    # 中間結果を表示する
+    n_save = 0
+    @chainer.training.make_extension(trigger=(1000, 'epoch'))
+    def save_model(trainer):
+        global n_save
+        n_save = n_save+1
+
+        # 途中結果を保存
+        chainer.serializers.save_hdf5('super_reso_'+str(n_save)+'.hdf5', model)
+
+    trainer.extend(save_model)
+
+    trainer.run()
+
+    # 最終結果を保存
+    chainer.serializers.save_hdf5('chapt03.hdf5', model)
+
 
 
 
