@@ -22,8 +22,10 @@ class DCGAN_Generator_NN(chainer.Chain):
         #         initial_bias=None, *, groups=1)
         with self.init_scope():
             self.l0 = L.Linear(100, (neuron_size **3) //8 //8, initialW=weight_initializer)
+            self.bn0 = L.BatchNormalization(neuron_size//8//8)
             self.dc1 = L.Deconvolution2D(in_channels=neuron_size, out_channels=neuron_size // 2, ksize=4,
                                          stride=2, pad=1, nobias=False, outsize=None, initialW=weight_initializer)
+
             self.dc2 = L.Deconvolution2D(neuron_size//2, neuron_size //4, 4, 2, 1, initialW=weight_initializer)
             self.bn1 = L.BatchNormalization(neuron_size//2)
             self.dc3 = L.Deconvolution2D(neuron_size//4, neuron_size //8, 4, 2, 1, nitialW=weight_initializer)
@@ -34,7 +36,15 @@ class DCGAN_Generator_NN(chainer.Chain):
 
     def __call__(self, z):
         shape = (len(z), neuron_size, image_size // 8, image_size //8)
-        h = F.reshape(F.relu(self.bn0()))
+        h = F.reshape(F.relu(self.bn0(self.l0(z))), shape)
+
+        h = F.relu(self.bn1(self.dc1(h)))
+        h = F.relu(self.bn2(self.dc2(h)))
+        h = F.relu(self.bn3(self.dc3(h)))
+        x = F.sigmoid(self.dc4(h))
+
+        return x # 結果を返すのみ
+
 
 
 # 鑑定側のNN
