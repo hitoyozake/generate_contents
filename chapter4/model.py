@@ -92,3 +92,13 @@ class DCGAN_Discreminator_NN(chainer.Chain):
         h = F.dropout(F.leaky_relu(self.bn3_0(self.c3_0(h))), ratio=0.2)
 
         return self.l4(h)
+
+class DCGANUpdater(chainer.training.StandardUpdater):
+
+    def __init__(self, train_iter, optimizer, device):
+        super(DCGANUpdater, self).__init__(
+            train_iter,
+            optimizer,
+            device=device
+        )
+
