@@ -107,12 +107,26 @@ class DCGANUpdater(chainer.training.StandardUpdater):
     # 識別器の損失関数
     def loss_dis(self, dis, y_fake, y_real):
         batch_size = len(y_fake)
+        """
+        import numpy as np
+
+        beta = 1.0
+        t = 1.0/np.max(beta, 0.0001)
+        a = t * np.log1p(beta*(-y_fake))
+        b = t * np.log1p(beta*y_real)
+        log1p = log(1 + beta*x)
+        """
 
         L1 = F.sum(F.softplus(-y_real))/batch_size
         L2 = F.sum(F.softplus(y_fake))/batch_size
 
         loss = L1 + L2
 
+        return loss
+
+    def loss_gen(self, gen, y_fake):
+        batch_size = len(y_fake)
+        loss = F.sum(F.softplus(-y_fake))/batch_size
         return loss
 
 
