@@ -93,6 +93,8 @@ class DCGAN_Discreminator_NN(chainer.Chain):
 
         return self.l4(h)
 
+import math
+
 class DCGANUpdater(chainer.training.StandardUpdater):
 
     def __init__(self, train_iter, optimizer, device):
@@ -101,4 +103,17 @@ class DCGANUpdater(chainer.training.StandardUpdater):
             optimizer,
             device=device
         )
+
+    # 識別器の損失関数
+    def loss_dis(self, dis, y_fake, y_real):
+        batch_size = len(y_fake)
+
+        L1 = F.sum(F.softplus(-y_real))/batch_size
+        L2 = F.sum(F.softplus(y_fake))/batch_size
+
+        loss = L1 + L2
+
+        return loss
+
+
 
