@@ -2,12 +2,16 @@
 
 import chainer
 import chainer.links as L, chainer.functions as F
-import numpy
+import numpy as np
+
+xp = np
+
 
 batch_size = 10
 use_device = -1
 image_size = 128 # 生成画像のサイズ
 neuron_size = 64 # 中間層のサイズ
+
 
 # 贋作側のNN
 class DCGAN_Generator_NN(chainer.Chain):
@@ -129,5 +133,32 @@ class DCGANUpdater(chainer.training.StandardUpdater):
         loss = F.sum(F.softplus(-y_fake))/batch_size
         return loss
 
+    def update_core(self):
+        # iteratorからバッチ文のデータを取得
+        batch = self.get_iterator(name='main').next()
+        src = self.converter(batch, self.device)
 
+        # optimizerを取得
+        optimizer_gen = self.get_optimizer(name='opt_gen')
+        optimizer_dis = self.get_optimizer(name='opt_dis')
+
+        # optimizerからNNを取得
+        gen = optimizer_gen.target
+        dis = optimizer_gen.target
+
+        # 乱数データを用意
+        import random
+
+        rnd = random.uniform(-1, 1, (src.shape[0], 100))
+        rnd = xp.array(rnd, dtype=xp.float32)
+
+        # 画像生成(fake)
+        x_fake = gen(rnd)
+        y_fake = dis(x_fake) # 認識結果
+        y_real = dis(src) # 教師データの認識結果
+
+
+        # update NN
+        optimizer_dis.update(self.loss_dis, dis, y_fake, y_real)
+        optimizer_gen.update(self.loss_gen, gen, y_fake)
 
