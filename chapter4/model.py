@@ -3,6 +3,7 @@
 import chainer
 import chainer.links as L, chainer.functions as F
 import numpy as np
+import chainer.cuda
 
 xp = np
 
@@ -24,15 +25,16 @@ class DCGAN_Generator_NN(chainer.Chain):
         # in_channels, out_channels, ksize=None, stride=1, pad=0,
         #         nobias=False, outsize=None, initialW=None,
         #         initial_bias=None, *, groups=1)
+        nii = neuron_size * (image_size **2)
         with self.init_scope():
-            self.l0 = L.Linear(100, (neuron_size **3) //8 //8, initialW=weight_initializer)
-            self.bn0 = L.BatchNormalization(neuron_size//8//8)
+            self.l0 = L.Linear(100, nii //8 //8, initialW=weight_initializer)
+            self.bn0 = L.BatchNormalization(nii//8 //8)
             self.dc1 = L.Deconvolution2D(in_channels=neuron_size, out_channels=neuron_size // 2, ksize=4,
                                          stride=2, pad=1, nobias=False, outsize=None, initialW=weight_initializer)
 
             self.dc2 = L.Deconvolution2D(neuron_size//2, neuron_size //4, 4, 2, 1, initialW=weight_initializer)
             self.bn1 = L.BatchNormalization(neuron_size//2)
-            self.dc3 = L.Deconvolution2D(neuron_size//4, neuron_size //8, 4, 2, 1, nitialW=weight_initializer)
+            self.dc3 = L.Deconvolution2D(neuron_size//4, neuron_size //8, 4, 2, 1, initialW=weight_initializer)
             self.bn2 = L.BatchNormalization(neuron_size//4)
             self.dc4 = L.Deconvolution2D(neuron_size//8,               3, 3, 1, 1, initialW=weight_initializer)
             self.bn3 = L.BatchNormalization(neuron_size // 8)
@@ -40,7 +42,10 @@ class DCGAN_Generator_NN(chainer.Chain):
 
     def __call__(self, z):
         shape = (len(z), neuron_size, image_size // 8, image_size //8)
-        h = F.reshape(F.relu(self.bn0(self.l0(z))), shape)
+        l = self.l0(z)
+        b = self.bn0(l)
+        v = F.relu(b)
+        h = F.reshape(v, shape)
 
         h = F.relu(self.bn1(self.dc1(h)))
         h = F.relu(self.bn2(self.dc2(h)))
@@ -145,13 +150,14 @@ class DCGANUpdater(chainer.training.StandardUpdater):
 
         # optimizerからNNを取得
         gen = optimizer_gen.target
-        dis = optimizer_gen.target
+        dis = optimizer_dis.target
 
         # 乱数データを用意
-        import random
-
+        from numpy import random
+        print("src.shape[0]:", src.shape[0])
         rnd = random.uniform(-1, 1, (src.shape[0], 100))
         rnd = xp.array(rnd, dtype=xp.float32)
+
 
         # 画像生成(fake)
         x_fake = gen(rnd)
