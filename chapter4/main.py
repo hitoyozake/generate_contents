@@ -16,6 +16,7 @@ def make_train_data():
     for fn in files:
         img = Image.open('train/' + fn).resize((128, 128)).convert('RGB')
         img = np.array(img, dtype=np.float32) /255.0
+        img = img.transpose(2,0,1)
         train_imgs.append(img)
 
     return train_imgs
