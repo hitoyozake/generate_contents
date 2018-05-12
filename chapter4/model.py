@@ -135,10 +135,11 @@ class DCGANUpdater(chainer.training.StandardUpdater):
 
     def update_core(self):
         # iteratorからバッチ文のデータを取得
+        # 学習データは贋作者も鑑定人も共通なので同じイテレータ(batch)を使用する
         batch = self.get_iterator(name='main').next()
         src = self.converter(batch, self.device)
 
-        # optimizerを取得
+        # optimizerを取得(計算グラフの作成)
         optimizer_gen = self.get_optimizer(name='opt_gen')
         optimizer_dis = self.get_optimizer(name='opt_dis')
 
