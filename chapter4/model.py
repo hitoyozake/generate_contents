@@ -74,12 +74,12 @@ class DCGAN_Discreminator_NN(chainer.Chain):
             # stride=1, pad=0, nobias=False, initialW=None, initial_bias=None, *, dilate=1, groups=1)
             self.c0_1 = L.Convolution2D(neuron_size // 8, neuron_size // 4, ksize=4, stride=1, pad=1, nobias=False, initialW=weight_initializer)
             self.c1_0 = L.Convolution2D(neuron_size // 4, neuron_size // 4, 3, 2, 1, initialW=weight_initializer)
-            self.c1_1 = L.Convolution2D(neuron_size // 2, neuron_size // 2, 4, 2, 1, initialW=weight_initializer)
+            self.c1_1 = L.Convolution2D(neuron_size // 4, neuron_size // 2, 4, 2, 1, initialW=weight_initializer)
             self.c2_0 = L.Convolution2D(neuron_size // 2, neuron_size // 2, 3, 1, 1, initialW=weight_initializer)
             self.c2_1 = L.Convolution2D(neuron_size // 2, neuron_size, 4, 2, 1, initialW=weight_initializer)
-            self.c3_0 = L.Linear(neuron_size * image_size * image_size // 8 //8, 1, initialW=weight_initializer)
+            self.c3_0 = L.Convolution2D(neuron_size, neuron_size, 3, 1, 1, initialW=weight_initializer)
 
-            self.l4 = L.Linear(neuron_size * image_size * image_size //8 // 6 ) # 全結合
+            self.l4 = L.Linear(neuron_size * image_size * image_size //8 //8, 1, initialW=weight_initializer) # 全結合
 
             self.bn0_1 = L.BatchNormalization(neuron_size //4, use_gamma=False)
             self.bn1_0 = L.BatchNormalization(neuron_size // 4, use_gamma=False)
@@ -91,7 +91,8 @@ class DCGAN_Discreminator_NN(chainer.Chain):
 
 
     def __call__(self, x):
-        h = F.leaky_relu(self.c0_0(x))
+        a = self.c0_0(x)
+        h = F.leaky_relu(a)
 
         h = F.dropout(F.leaky_relu(self.bn0_1(self.c0_1(h))), ratio=0.2)
         h = F.dropout(F.leaky_relu(self.bn1_0(self.c1_0(h))), ratio=0.2)
@@ -154,10 +155,9 @@ class DCGANUpdater(chainer.training.StandardUpdater):
 
         # 乱数データを用意
         from numpy import random
-        print("src.shape[0]:", src.shape[0])
+
         rnd = random.uniform(-1, 1, (src.shape[0], 100))
         rnd = xp.array(rnd, dtype=xp.float32)
-
 
         # 画像生成(fake)
         x_fake = gen(rnd)
