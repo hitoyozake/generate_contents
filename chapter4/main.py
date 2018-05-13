@@ -7,6 +7,7 @@ import os
 import numpy as np
 from chainer import optimizers
 batch_size = 10
+import cupy
 
 def make_train_data():
     files = os.listdir('train')
@@ -33,7 +34,8 @@ def main(devices = -1):
 
         model_dis.to_gpu(0)
         model_gen.to_gpu(0)
-
+        xp = cupy
+        cp = cupy
     imgs = make_train_data()
 
     train_iter = chainer.iterators.SerialIterator(imgs, batch_size, shuffle=True)
@@ -44,7 +46,7 @@ def main(devices = -1):
     optimizer_gen.setup(model_gen)
     optimizer_dis.setup(model_dis)
 
-    updater = chapter4.model.DCGANUpdater(train_iter, {'opt_gen':optimizer_gen, 'opt_dis':optimizer_dis}, device=devices)
+    updater = chapter4.model.DCGANUpdater(train_iter, {'opt_gen':optimizer_gen, 'opt_dis':optimizer_dis}, device=int(devices))
 
     # 機械学習の実行
     trainer = chainer.training.Trainer(updater, (1000, 'epoch'), out='result')
@@ -57,7 +59,7 @@ def main(devices = -1):
     @chainer.training.make_extension(trigger=(1000, 'epoch'))
     def save_model(trainer):
         global n_save
-        n_save += 1
+        n_save = n_save + 1
         chainer.serializers.save_hdf5('chapt04-gen-{0:d}.hdf'.format(n_save), model_gen)
         chainer.serializers.save_hdf5('chapt04-dis-{0:d}.hdf'.format(n_save), model_dis)
 
