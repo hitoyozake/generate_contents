@@ -5,7 +5,13 @@ import chainer.links as L, chainer.functions as F
 import numpy as np
 import chainer.cuda
 
-xp = np
+try:
+    import cupy as cp
+    xp = cp
+except:
+    xp = np
+    pass
+
 
 
 batch_size = 10
