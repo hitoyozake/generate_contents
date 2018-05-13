@@ -22,6 +22,7 @@ def make_train_data():
 
     return train_imgs
 
+n_save = 0
 
 def main(devices = -1):
 
@@ -54,8 +55,7 @@ def main(devices = -1):
     trainer.extend(chainer.training.extensions.ProgressBar())
 
     # 中韓結果の保存
-    n_save = 0
-
+    
     @chainer.training.make_extension(trigger=(1000, 'epoch'))
     def save_model(trainer):
         global n_save
