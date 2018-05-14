@@ -37,7 +37,7 @@ def make_train_data():
 
     return train_imgs
 
-def main(use_device=0):
+def main(use_device=-1):
     print("main chapter3")
 
     model = chapter3.model.SuperResolutionModel()
