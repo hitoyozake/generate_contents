@@ -13,5 +13,5 @@ class GatherImagesItem(scrapy.Item):
     image_directory_name = scrapy.Field()
     # Fieldは連想配列みたいなもの
     images = scrapy.Field()
+    image_urls = scrapy.Field()
 
-    pass
