@@ -15,11 +15,13 @@ class GatherImagesPipeline(ImagesPipeline):
     def get_media_requests(self, item, info):
         for image_url in item['image_urls']:
             # metaは itemに定義したField名をKeyとして対応するvalueを持つ
+            print("*******MEDIAREQUEST******")
             yield scrapy.Request(image_url, meta={'image_directory_name': item['image_directory_name']})
 
+    """
     def image_downloaded(self, response, request, info):
         checksum = None
-
+        print("*****pipeline****")
         for path, image, buf in self.get_images(response, request, info):
             if checksum is None:
                 buf.seek(0)
@@ -27,7 +29,7 @@ class GatherImagesPipeline(ImagesPipeline):
 
             width, height = image.size
 
-            filename = request._url.rsplit("/", 1)[1]
+            filename = request._urls.rsplit("/", 1)[1]
 
             path = 'full/{0}/{1}'.format(response.meta['image_directory_name'], filename)
 
@@ -37,4 +39,4 @@ class GatherImagesPipeline(ImagesPipeline):
             )
 
             return checksum
-
+    """

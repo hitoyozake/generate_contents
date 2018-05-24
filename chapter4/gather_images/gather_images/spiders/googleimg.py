@@ -12,10 +12,10 @@ class GoogleImageSpider(scrapy.Spider):
 
     name = "googleImageSpider"
 
-    allowed_domains = ["google.com"]
+    # allowed_domains = ["google.com", "https://encrypted-tbn0.gstatic.com"]
 
     start_urls = []
-    
+
     def generate(self, keyword):
         ar = []
         for i in range(0, 8):
@@ -44,6 +44,7 @@ class GoogleImageSpider(scrapy.Spider):
 
     def parse(self, response):
         item = GatherImagesItem()
+        print("******PARSE*******")
         item["image_urls"] = []
         for url in response.xpath("//img/@src").extract():
             item['image_urls'].append(url)
