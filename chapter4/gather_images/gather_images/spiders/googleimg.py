@@ -3,7 +3,10 @@
 import scrapy
 import json
 import os
-from gather_images.items import GatherImagesItem
+try:
+    from gather_images.items import GatherImagesItem
+except:
+    from gather_images.gather_images.items import GatherImagesItem
 
 class GoogleImageSpider(scrapy.Spider):
 
@@ -12,7 +15,7 @@ class GoogleImageSpider(scrapy.Spider):
     allowed_domains = ["google.com"]
 
     start_urls = []
-
+    
     def generate(self, keyword):
         ar = []
         for i in range(0, 8):
