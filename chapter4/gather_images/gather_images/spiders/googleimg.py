@@ -3,6 +3,7 @@
 import scrapy
 import json
 import os
+from gather_images.items import GatherImagesItem
 
 class GoogleImageSpider(scrapy.Spider):
 
@@ -39,9 +40,12 @@ class GoogleImageSpider(scrapy.Spider):
                             GoogleImageSpider.start_urls.append(url)
 
     def parse(self, response):
+        item = GatherImagesItem()
+        item["image_urls"] = []
         for url in response.xpath("//img/@src").extract():
-            print("URL:", url)
+            item['image_urls'].append(url)
 
+        return item
 
 
 
