@@ -7,8 +7,11 @@
 
 import scrapy
 
-
 class GatherImagesItem(scrapy.Item):
     # define the fields for your item here like:
-    # name = scrapy.Field()
+    name = scrapy.Field()
+    image_directory_name = scrapy.Field()
+    # Fieldは連想配列みたいなもの
+    images = scrapy.Field()
+
     pass

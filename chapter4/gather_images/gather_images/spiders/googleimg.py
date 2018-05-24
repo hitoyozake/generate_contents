@@ -26,14 +26,14 @@ class GoogleImageSpider(scrapy.Spider):
         root = os.path.dirname(os.path.abspath(__file__)) + "/"
 
         with open(root+"start_urls.json") as f:
-            jsdata = json.loads(f.read(), 'shift_jis')
+            jsdata = json.loads(f.read())
 
             for i in jsdata:
-                if 'start_urls' in i:
-                    for url in i['start_urls']:
+                if 'start_urls' in jsdata[i]:
+                    for url in jsdata[i]['start_urls']:
                         GoogleImageSpider.start_urls.append(url)
                 if 'keywords' in i:
-                    for keyword in i['keyword']:
+                    for keyword in jsdata[i]['keyword']:
                         ar = self.generate(keyword)
                         for url in ar:
                             GoogleImageSpider.start_urls.append(url)

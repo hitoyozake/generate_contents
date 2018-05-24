@@ -65,9 +65,13 @@ DOWNLOAD_DELAY = 5
 
 # Configure item pipelines
 # See http://scrapy.readthedocs.org/en/latest/topics/item-pipeline.html
-#ITEM_PIPELINES = {
-#    'gather_images.pipelines.GatherImagesPipeline': 300,
-#}
+ITEM_PIPELINES = { 'gather_images.pipeline.GathermagesPipeline': 1} # pipeline.pyに追加したクラス名
+# 画像の保存先
+IMAGE_STORE = "./saveImages"
+
+# ITEM_PIPELINES = {
+#     'gather_images.pipelines.GatherImagesPipeline': 300,
+# }
 
 # Enable and configure the AutoThrottle extension (disabled by default)
 # See http://doc.scrapy.org/en/latest/topics/autothrottle.html
