@@ -64,8 +64,8 @@ DOWNLOAD_DELAY = 5
 #}
 # Configure item pipelines
 # See http://scrapy.readthedocs.org/en/latest/topics/item-pipeline.html
-# ITEM_PIPELINES = { 'gather_images.pipelines.GatherImagesPipeline': 1} # pipeline.pyに追加したクラス名
-ITEM_PIPELINES = {"scrapy.contrib.pipeline.images.ImagesPipeline":1}
+ITEM_PIPELINES = { 'gather_images.pipelines.GatherImagesPipeline': 1} # pipeline.pyに追加したクラス名
+# ITEM_PIPELINES = {"scrapy.contrib.pipeline.images.ImagesPipeline":1}
 
 # 画像の保存先
 IMAGES_STORE = "./saveImages"
