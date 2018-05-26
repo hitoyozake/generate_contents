@@ -11,6 +11,7 @@ except:
 class GoogleImageSpider(scrapy.Spider):
 
     name = "googleImageSpider"
+    counter = 0
 
     # allowed_domains = ["google.com", "https://encrypted-tbn0.gstatic.com"]
 
@@ -44,8 +45,9 @@ class GoogleImageSpider(scrapy.Spider):
 
     def parse(self, response):
         item = GatherImagesItem()
-        print("******PARSE*******")
         item["image_urls"] = []
+        item["image_directory_name"] = str(self.counter)
+        self.counter += 1
         for url in response.xpath("//img/@src").extract():
             item['image_urls'].append(url)
 
