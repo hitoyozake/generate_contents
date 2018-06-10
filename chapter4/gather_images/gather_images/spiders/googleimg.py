@@ -33,11 +33,13 @@ class GoogleImageSpider(scrapy.Spider):
             jsdata = json.loads(f.read())
 
             for i in jsdata:
+                """
                 if 'start_urls' in jsdata[i]:
                     for url in jsdata[i]['start_urls']:
                         GoogleImageSpider.start_urls.append(url)
-                if 'keywords' in i:
-                    for keyword in jsdata[i]['keyword']:
+                """
+                if 'keywords' in jsdata[i]:
+                    for keyword in jsdata[i]['keywords']:
                         ar = self.generate(keyword)
                         for url in ar:
                             GoogleImageSpider.start_urls.append(url)
@@ -46,6 +48,7 @@ class GoogleImageSpider(scrapy.Spider):
         item = GatherImagesItem()
         print("******PARSE*******")
         item["image_urls"] = []
+        item["image_directory_name"]="dl"
         for url in response.xpath("//img/@src").extract():
             item['image_urls'].append(url)
 

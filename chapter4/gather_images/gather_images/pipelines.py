@@ -12,13 +12,15 @@ from scrapy.pipelines.images import ImagesPipeline
 # そのままだとSHA-1でハッシュ化したファイル名にするのでカスタマイズする
 class GatherImagesPipeline(ImagesPipeline):
 
+    count = 0
+
     def get_media_requests(self, item, info):
         for image_url in item['image_urls']:
             # metaは itemに定義したField名をKeyとして対応するvalueを持つ
             print("*******MEDIAREQUEST******")
             yield scrapy.Request(image_url, meta={'image_directory_name': item['image_directory_name']})
 
-    """
+
     def image_downloaded(self, response, request, info):
         checksum = None
         print("*****pipeline****")
@@ -29,9 +31,11 @@ class GatherImagesPipeline(ImagesPipeline):
 
             width, height = image.size
 
-            filename = request._urls.rsplit("/", 1)[1]
+            filename = "{0:010}.jpg".format(self.count)
 
-            path = 'full/{0}/{1}'.format(response.meta['image_directory_name'], filename)
+            self.count += 1
+
+            path = 'full/dl/{0}'.format(filename)
 
             self.store.persist_file(
                 path, buf, info,
@@ -39,4 +43,4 @@ class GatherImagesPipeline(ImagesPipeline):
             )
 
             return checksum
-    """
+
