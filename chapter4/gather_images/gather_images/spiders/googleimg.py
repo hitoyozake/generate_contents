@@ -16,6 +16,7 @@ class GoogleImageSpider(scrapy.Spider):
     # allowed_domains = ["google.com", "https://encrypted-tbn0.gstatic.com"]
 
     start_urls = []
+    directory_name = 'imgs'
 
     def generate(self, keyword):
         ar = []
@@ -33,6 +34,9 @@ class GoogleImageSpider(scrapy.Spider):
         with open(root+"start_urls.json") as f:
             jsdata = json.loads(f.read())
 
+            if 'dir_name' in jsdata:
+                self.directory_name = jsdata['dir_name']
+
             for i in jsdata:
                 if 'start_urls' in jsdata[i]:
                     for url in jsdata[i]['start_urls']:
@@ -43,13 +47,14 @@ class GoogleImageSpider(scrapy.Spider):
                         for url in ar:
                             GoogleImageSpider.start_urls.append(url)
 
+
     def parse(self, response):
         item = GatherImagesItem()
         print("******PARSE*******")
         item["image_urls"] = []
 
         self.counter += 1
-        item["image_directory_name"]="dl"
+        item["image_directory_name"]=self.directory_name
         for url in response.xpath("//img/@src").extract():
             item['image_urls'].append(url)
 
