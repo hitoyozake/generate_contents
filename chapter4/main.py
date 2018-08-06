@@ -7,7 +7,6 @@ import os
 import numpy as np
 from chainer import optimizers
 batch_size = 10
-import cupy
 
 def make_train_data():
     files = os.listdir('train')
@@ -35,8 +34,13 @@ def main(devices = -1):
 
         model_dis.to_gpu(0)
         model_gen.to_gpu(0)
-        xp = cupy
-        cp = cupy
+        try:
+            import cupy
+            xp = cupy
+            cp = cupy
+        except:
+            xp = numpy
+            cp = numpy
     imgs = make_train_data()
 
     train_iter = chainer.iterators.SerialIterator(imgs, batch_size, shuffle=True)
