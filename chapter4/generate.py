@@ -7,7 +7,7 @@ import os
 import numpy as np
 from chainer import optimizers
 batch_size = 10
-
+import chainer.cuda
 try:
     import cupy as cp
 except:
@@ -48,8 +48,8 @@ def main(devices = -1):
 
         dst = result.data[i]*255
 
-        if use_device >= 0:
-            dst = chainer.cuda.cuda.to_cpu(dst)
+        if int(use_device) >= 0:
+            dst = chainer.cuda.to_cpu(dst)
 
         data[:,:,0] = dst[0]
         data[:,:,1] = dst[1]

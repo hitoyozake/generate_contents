@@ -12,12 +12,10 @@ except:
     xp = np
     pass
 
-
-
-batch_size = 10
+batch_size = 32
 use_device = -1
 image_size = 128 # 生成画像のサイズ
-neuron_size = 64 # 中間層のサイズ
+neuron_size = 512 # 中間層のサイズ
 
 
 # 贋作側のNN

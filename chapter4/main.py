@@ -50,7 +50,7 @@ def main(devices = -1):
     updater = chapter4.model.DCGANUpdater(train_iter, {'opt_gen':optimizer_gen, 'opt_dis':optimizer_dis}, device=int(devices))
 
     # 機械学習の実行
-    trainer = chainer.training.Trainer(updater, (1000, 'epoch'), out='result')
+    trainer = chainer.training.Trainer(updater, (1500, 'epoch'), out='result')
 
     trainer.extend(chainer.training.extensions.ProgressBar())
 
