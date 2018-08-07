@@ -37,8 +37,8 @@ class GoogleImageSpider(scrapy.Spider):
                 if 'start_urls' in jsdata[i]:
                     for url in jsdata[i]['start_urls']:
                         GoogleImageSpider.start_urls.append(url)
-                if 'keywords' in i:
-                    for keyword in jsdata[i]['keyword']:
+                if 'keywords' in jsdata[i]:
+                    for keyword in jsdata[i]['keywords']:
                         ar = self.generate(keyword)
                         for url in ar:
                             GoogleImageSpider.start_urls.append(url)
