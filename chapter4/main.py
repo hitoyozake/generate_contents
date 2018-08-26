@@ -28,19 +28,19 @@ def main(devices = -1):
     model_dis = chapter4.model.DCGAN_Discreminator_NN()
     model_gen = chapter4.model.DCGAN_Generator_NN()
 
-    if devices == 1:
+    if devices == 0:
         import cuda
         cuda.get_device_from_id(0).use()
 
         model_dis.to_gpu(0)
         model_gen.to_gpu(0)
-        try:
-            import cupy
-            xp = cupy
-            cp = cupy
-        except:
-            xp = numpy
-            cp = numpy
+        # try:
+        import cupy
+        xp = cupy
+        cp = cupy
+        # except:
+            # xp = numpy
+            # cp = numpy
     imgs = make_train_data()
 
     train_iter = chainer.iterators.SerialIterator(imgs, batch_size, shuffle=True)
@@ -54,7 +54,7 @@ def main(devices = -1):
     updater = chapter4.model.DCGANUpdater(train_iter, {'opt_gen':optimizer_gen, 'opt_dis':optimizer_dis}, device=int(devices))
 
     # 機械学習の実行
-    trainer = chainer.training.Trainer(updater, (1500, 'epoch'), out='result')
+    trainer = chainer.training.Trainer(updater, (200, 'epoch'), out='result')
 
     trainer.extend(chainer.training.extensions.ProgressBar())
 
