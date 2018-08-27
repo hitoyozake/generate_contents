@@ -23,10 +23,15 @@ def make_train_data():
 
 n_save = 0
 
-def main(devices = -1):
-
+def main(devices = -1, gen = "", dis = ""):
+    
     model_dis = chapter4.model.DCGAN_Discreminator_NN()
     model_gen = chapter4.model.DCGAN_Generator_NN()
+
+    if gen != "":
+        selializer.load_hdf5(gen, model_gen)
+    if dis != "":
+        serializer.load_hdf5(dis, model_dis)
 
     if devices == 0:
         import cuda
@@ -58,7 +63,7 @@ def main(devices = -1):
 
     trainer.extend(chainer.training.extensions.ProgressBar())
 
-    # 中韓結果の保存
+    # 中間結果の保存
     
     @chainer.training.make_extension(trigger=(1000, 'epoch'))
     def save_model(trainer):
@@ -81,4 +86,11 @@ if __name__ == '__main__':
     use_device = -1
     if len(sys.argv) >= 2:
         use_device = sys.argv[1]
-    main(use_device)
+
+    gen = ""
+    dis = ""
+    if len(sys.argv) >= 4:
+        gen = argv[2]
+        dis = argv[3]
+
+    main(use_device, gen, dis)
