@@ -15,6 +15,7 @@ except:
 
 n_save = 0
 
+import chainer.computational_graph as c
 
 def main(devices = -1):
 
