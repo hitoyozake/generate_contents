@@ -34,6 +34,7 @@ class DCGAN_Generator_NN(chainer.Chain):
         with self.init_scope():
             self.l0 = L.Linear(100, nii //8 //8, initialW=weight_initializer)
             self.bn0 = L.BatchNormalization(nii//8 //8)
+
             self.dc1 = L.Deconvolution2D(in_channels=neuron_size, out_channels=neuron_size // 2, ksize=4,
                                          stride=2, pad=1, nobias=False, outsize=None, initialW=weight_initializer)
 
@@ -79,9 +80,9 @@ class DCGAN_Discreminator_NN(chainer.Chain):
             # stride=1, pad=0, nobias=False, initialW=None, initial_bias=None, *, dilate=1, groups=1)
             self.c0_1 = L.Convolution2D(neuron_size // 8, neuron_size // 4, ksize=4, stride=1, pad=1, nobias=False, initialW=weight_initializer)
             self.c1_0 = L.Convolution2D(neuron_size // 4, neuron_size // 4, 3, 2, 1, initialW=weight_initializer)
-            self.c1_1 = L.Convolution2D(neuron_size // 4, neuron_size // 2, 4, 2, 1, initialW=weight_initializer)
+            # self.c1_1 = L.Convolution2D(neuron_size // 4, neuron_size // 2, 4, 2, 1, initialW=weight_initializer)
             self.c2_0 = L.Convolution2D(neuron_size // 2, neuron_size // 2, 3, 1, 1, initialW=weight_initializer)
-            self.c2_1 = L.Convolution2D(neuron_size // 2, neuron_size, 4, 2, 1, initialW=weight_initializer)
+            # self.c2_1 = L.Convolution2D(neuron_size // 2, neuron_size, 4, 2, 1, initialW=weight_initializer)
             self.c3_0 = L.Convolution2D(neuron_size, neuron_size, 3, 1, 1, initialW=weight_initializer)
 
             self.l4 = L.Linear(neuron_size * image_size * image_size //8 //8, 1, initialW=weight_initializer) # 全結合
