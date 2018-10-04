@@ -4,6 +4,7 @@ import chainer
 import chainer.links as L, chainer.functions as F
 import numpy as np
 import chainer.cuda
+import chainer.computational_graph as c
 
 try:
     import cupy as cp
@@ -111,12 +112,15 @@ import math
 
 class DCGANUpdater(chainer.training.StandardUpdater):
 
+    only_once = False
+
     def __init__(self, train_iter, optimizer, device):
         super(DCGANUpdater, self).__init__(
             train_iter,
             optimizer,
             device=device
         )
+        self.only_once = False
 
     # 識別器の損失関数
     def loss_dis(self, dis, y_fake, y_real):
@@ -167,6 +171,12 @@ class DCGANUpdater(chainer.training.StandardUpdater):
         x_fake = gen(rnd)
         y_fake = dis(x_fake) # 認識結果
         y_real = dis(src) # 教師データの認識結果
+
+        if self.only_once == False:
+            self.only_once = True
+            g = c.build_computational_graph(x_fake)
+            with open('graph.dot', 'w') as d:
+                d.write(g.dump())
 
 
         # update NN
