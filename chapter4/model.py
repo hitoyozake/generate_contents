@@ -73,19 +73,23 @@ class DCGAN_Discreminator_NN(chainer.Chain):
 
 
         # NNの定義
-        with self.init_scope(): # init_scopeの中でsuperクラスのメンバ変数の初期化を行う
+        with self.init_scope():  # init_scopeの中でsuperクラスのメンバ変数の初期化を行う
             # // ・・・Pythonの除算演算子の１つ．結果を整数で得る(x/yだとfloatになるが，x//yだとintの結果を得る)
             self.c0_0 = L.Convolution2D(3, neuron_size // 8, 3, 1, 1, initialW=weight_initializer)
             # Convolution2D(self, in_channels, out_channels, ksize=None,
             # stride=1, pad=0, nobias=False, initialW=None, initial_bias=None, *, dilate=1, groups=1)
-            self.c0_1 = L.Convolution2D(neuron_size // 8, neuron_size // 4, ksize=4, stride=1, pad=1, nobias=False, initialW=weight_initializer)
-            self.c1_0 = L.Convolution2D(neuron_size // 4, neuron_size // 2, 4, 2, 1, initialW=weight_initializer)
-            # self.c1_1 = L.Convolution2D(neuron_size // 4, neuron_size // 2, 4, 2, 1, initialW=weight_initializer)
-            self.c2_0 = L.Convolution2D(neuron_size // 2, neuron_size, 4, 2, 1, initialW=weight_initializer)
-            # self.c2_1 = L.Convolution2D(neuron_size // 2, neuron_size, 4, 2, 1, initialW=weight_initializer)
+            self.c0_1 = L.Convolution2D(neuron_size // 8, neuron_size // 4, ksize=4, stride=1, pad=1, nobias=False,
+                                        initialW=weight_initializer)
+            # self.c1_0 = L.Convolution2D(neuron_size // 4, neuron_size // 4, 3, 2, 1, initialW=weight_initializer)
+            self.c1_1 = L.Convolution2D(neuron_size // 4, neuron_size // 2, 4, 2, 1, initialW=weight_initializer)
+            # self.c2_0 = L.Convolution2D(neuron_size // 2, neuron_size // 2, 3, 1, 1, initialW=weight_initializer)
+            self.c2_1 = L.Convolution2D(neuron_size // 2, neuron_size, 4, 2, 1, initialW=weight_initializer)
             self.c3_0 = L.Convolution2D(neuron_size, neuron_size, 3, 1, 1, initialW=weight_initializer)
 
-            self.l4 = L.Linear(neuron_size * image_size * image_size //8 //8, 1, initialW=weight_initializer) # 全結合
+
+            self.l4 = L.Linear(None, 1, initialW=weight_initializer)  # 全結合
+            # self.l4 = L.Linear(neuron_size * image_size * image_size // 8 // 8, 1, initialW=weight_initializer)  # 全結合
+
 
             self.bn0_1 = L.BatchNormalization(neuron_size // 4, use_gamma=False)
             self.bn1_0 = L.BatchNormalization(neuron_size // 4, use_gamma=False)
@@ -94,17 +98,15 @@ class DCGAN_Discreminator_NN(chainer.Chain):
             self.bn2_1 = L.BatchNormalization(neuron_size, use_gamma=False)
             self.bn3_0 = L.BatchNormalization(neuron_size, use_gamma=False)
 
-
-
     def __call__(self, x):
         a = self.c0_0(x)
         h = F.leaky_relu(a)
 
         h = F.dropout(F.leaky_relu(self.bn0_1(self.c0_1(h))), ratio=0.2)
-        h = F.dropout(F.leaky_relu(self.bn1_1(self.c1_0(h))), ratio=0.2)
-        # h = F.dropout(F.leaky_relu(self.bn1_1(self.c1_1(h))), ratio=0.2)
-        h = F.dropout(F.leaky_relu(self.bn2_1(self.c2_0(h))), ratio=0.2)
-        # h = F.dropout(F.leaky_relu(self.bn2_1(self.c2_1(h))), ratio=0.2)
+        # h = F.dropout(F.leaky_relu(self.bn1_0(self.c1_0(h))), ratio=0.2)
+        h = F.dropout(F.leaky_relu(self.bn1_1(self.c1_1(h))), ratio=0.2)
+        # h = F.dropout(F.leaky_relu(self.bn2_0(self.c2_0(h))), ratio=0.2)
+        h = F.dropout(F.leaky_relu(self.bn2_1(self.c2_1(h))), ratio=0.2)
         h = F.dropout(F.leaky_relu(self.bn3_0(self.c3_0(h))), ratio=0.2)
 
         return self.l4(h)
