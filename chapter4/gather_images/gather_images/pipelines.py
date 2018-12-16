@@ -14,6 +14,7 @@ class GatherImagesPipeline(ImagesPipeline):
 
     count = 0
 
+
     def get_media_requests(self, item, info):
         for image_url in item['image_urls']:
             # metaは itemに定義したField名をKeyとして対応するvalueを持つ
