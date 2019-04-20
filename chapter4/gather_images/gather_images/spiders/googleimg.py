@@ -16,6 +16,7 @@ class GoogleImageSpider(scrapy.Spider):
     # allowed_domains = ["google.com", "https://encrypted-tbn0.gstatic.com"]
 
     start_urls = []
+    keywords = []
 
     def generate(self, keyword):
         ar = []
@@ -35,8 +36,9 @@ class GoogleImageSpider(scrapy.Spider):
 
             for i in jsdata:
                 if 'start_urls' in jsdata[i]:
-                    for url in jsdata[i]['start_urls']:
-                        GoogleImageSpider.start_urls.append(url)
+                    for elem in jsdata[i]['start_urls']:
+                        GoogleImageSpider.start_urls.append(elem)
+                        
                 if 'keywords' in jsdata[i]:
                     for keyword in jsdata[i]['keywords']:
                         ar = self.generate(keyword)
