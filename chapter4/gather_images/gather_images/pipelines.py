@@ -32,10 +32,11 @@ class GatherImagesPipeline(ImagesPipeline):
             width, height = image.size
 
             filename = "{0:010}.jpg".format(self.count)
+            dirname = response.meta['image_directory_name']
 
             self.count += 1
 
-            path = 'full/dl/{0}'.format(filename)
+            path = 'full/dl/{0}/{1}'.format(dirname, filename)
 
             self.store.persist_file(
                 path, buf, info,

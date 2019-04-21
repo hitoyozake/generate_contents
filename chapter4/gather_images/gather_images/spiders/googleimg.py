@@ -31,7 +31,7 @@ class GoogleImageSpider(scrapy.Spider):
         # もしもURLなどを初期化したいのならここで行う
         root = os.path.dirname(os.path.abspath(__file__)) + "/"
 
-        with open(root+"start_urls.json") as f:
+        with open(root+"start_urls.json", encoding='utf-8') as f:
             jsdata = json.loads(f.read())
 
             if 'dir_name' in jsdata:
@@ -54,7 +54,7 @@ class GoogleImageSpider(scrapy.Spider):
         item["image_urls"] = []
 
         self.counter += 1
-        item["image_directory_name"]=self.directory_name
+        item["image_directory_name"] = self.directory_name
         for url in response.xpath("//img/@src").extract():
             item['image_urls'].append(url)
 
