@@ -4,7 +4,6 @@ import chainer
 import chainer.links as L, chainer.functions as F
 import numpy as np
 import chainer.cuda
-import chainer.computational_graph as c
 
 try:
     import cupy as cp
@@ -16,7 +15,7 @@ except:
 batch_size = 64
 use_device = -1
 image_size = 128 # 生成画像のサイズ
-neuron_size = 512 # 中間層のサイズ
+neuron_size = 256# 中間層のサイズ
 
 
 # 贋作側のNN
@@ -34,7 +33,6 @@ class DCGAN_Generator_NN(chainer.Chain):
         with self.init_scope():
             self.l0 = L.Linear(100, nii //8 //8, initialW=weight_initializer)
             self.bn0 = L.BatchNormalization(nii//8 //8)
-
             self.dc1 = L.Deconvolution2D(in_channels=neuron_size, out_channels=neuron_size // 2, ksize=4,
                                          stride=2, pad=1, nobias=False, outsize=None, initialW=weight_initializer)
 
@@ -73,39 +71,37 @@ class DCGAN_Discreminator_NN(chainer.Chain):
 
 
         # NNの定義
-        with self.init_scope():  # init_scopeの中でsuperクラスのメンバ変数の初期化を行う
+        with self.init_scope(): # init_scopeの中でsuperクラスのメンバ変数の初期化を行う
             # // ・・・Pythonの除算演算子の１つ．結果を整数で得る(x/yだとfloatになるが，x//yだとintの結果を得る)
             self.c0_0 = L.Convolution2D(3, neuron_size // 8, 3, 1, 1, initialW=weight_initializer)
             # Convolution2D(self, in_channels, out_channels, ksize=None,
             # stride=1, pad=0, nobias=False, initialW=None, initial_bias=None, *, dilate=1, groups=1)
-            self.c0_1 = L.Convolution2D(neuron_size // 8, neuron_size // 4, ksize=4, stride=1, pad=1, nobias=False,
-                                        initialW=weight_initializer)
-            # self.c1_0 = L.Convolution2D(neuron_size // 4, neuron_size // 4, 3, 2, 1, initialW=weight_initializer)
+            self.c0_1 = L.Convolution2D(neuron_size // 8, neuron_size // 4, ksize=4, stride=1, pad=1, nobias=False, initialW=weight_initializer)
+            self.c1_0 = L.Convolution2D(neuron_size // 4, neuron_size // 4, 3, 2, 1, initialW=weight_initializer)
             self.c1_1 = L.Convolution2D(neuron_size // 4, neuron_size // 2, 4, 2, 1, initialW=weight_initializer)
-            # self.c2_0 = L.Convolution2D(neuron_size // 2, neuron_size // 2, 3, 1, 1, initialW=weight_initializer)
+            self.c2_0 = L.Convolution2D(neuron_size // 2, neuron_size // 2, 3, 1, 1, initialW=weight_initializer)
             self.c2_1 = L.Convolution2D(neuron_size // 2, neuron_size, 4, 2, 1, initialW=weight_initializer)
             self.c3_0 = L.Convolution2D(neuron_size, neuron_size, 3, 1, 1, initialW=weight_initializer)
 
+            self.l4 = L.Linear(neuron_size * image_size * image_size //8 //8, 1, initialW=weight_initializer) # 全結合
 
-            self.l4 = L.Linear(None, 1, initialW=weight_initializer)  # 全結合
-            # self.l4 = L.Linear(neuron_size * image_size * image_size // 8 // 8, 1, initialW=weight_initializer)  # 全結合
-
-
-            self.bn0_1 = L.BatchNormalization(neuron_size // 4, use_gamma=False)
+            self.bn0_1 = L.BatchNormalization(neuron_size //4, use_gamma=False)
             self.bn1_0 = L.BatchNormalization(neuron_size // 4, use_gamma=False)
             self.bn1_1 = L.BatchNormalization(neuron_size // 2, use_gamma=False)
             self.bn2_0 = L.BatchNormalization(neuron_size // 2, use_gamma=False)
             self.bn2_1 = L.BatchNormalization(neuron_size, use_gamma=False)
             self.bn3_0 = L.BatchNormalization(neuron_size, use_gamma=False)
 
+
+
     def __call__(self, x):
         a = self.c0_0(x)
         h = F.leaky_relu(a)
 
         h = F.dropout(F.leaky_relu(self.bn0_1(self.c0_1(h))), ratio=0.2)
-        # h = F.dropout(F.leaky_relu(self.bn1_0(self.c1_0(h))), ratio=0.2)
+        h = F.dropout(F.leaky_relu(self.bn1_0(self.c1_0(h))), ratio=0.2)
         h = F.dropout(F.leaky_relu(self.bn1_1(self.c1_1(h))), ratio=0.2)
-        # h = F.dropout(F.leaky_relu(self.bn2_0(self.c2_0(h))), ratio=0.2)
+        h = F.dropout(F.leaky_relu(self.bn2_0(self.c2_0(h))), ratio=0.2)
         h = F.dropout(F.leaky_relu(self.bn2_1(self.c2_1(h))), ratio=0.2)
         h = F.dropout(F.leaky_relu(self.bn3_0(self.c3_0(h))), ratio=0.2)
 
@@ -115,15 +111,12 @@ import math
 
 class DCGANUpdater(chainer.training.StandardUpdater):
 
-    only_once = False
-
     def __init__(self, train_iter, optimizer, device):
         super(DCGANUpdater, self).__init__(
             train_iter,
             optimizer,
             device=device
         )
-        self.only_once = False
 
     # 識別器の損失関数
     def loss_dis(self, dis, y_fake, y_real):
@@ -174,12 +167,6 @@ class DCGANUpdater(chainer.training.StandardUpdater):
         x_fake = gen(rnd)
         y_fake = dis(x_fake) # 認識結果
         y_real = dis(src) # 教師データの認識結果
-
-        if self.only_once == False:
-            self.only_once = True
-            g = c.build_computational_graph(x_fake)
-            with open('graph.dot', 'w') as d:
-                d.write(g.dump())
 
 
         # update NN

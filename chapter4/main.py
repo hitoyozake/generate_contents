@@ -7,7 +7,6 @@ import os
 import numpy as np
 from chainer import optimizers
 batch_size = 10
-import cupy
 
 def make_train_data():
     files = os.listdir('train')
@@ -24,19 +23,29 @@ def make_train_data():
 
 n_save = 0
 
-def main(devices = -1):
-
+def main(devices = -1, gen = "", dis = ""):
+    
     model_dis = chapter4.model.DCGAN_Discreminator_NN()
     model_gen = chapter4.model.DCGAN_Generator_NN()
 
-    if devices == 1:
+    if gen != "":
+        selializer.load_hdf5(gen, model_gen)
+    if dis != "":
+        serializer.load_hdf5(dis, model_dis)
+
+    if devices == 0:
         import cuda
         cuda.get_device_from_id(0).use()
 
         model_dis.to_gpu(0)
         model_gen.to_gpu(0)
+        # try:
+        import cupy
         xp = cupy
         cp = cupy
+        # except:
+            # xp = numpy
+            # cp = numpy
     imgs = make_train_data()
 
     train_iter = chainer.iterators.SerialIterator(imgs, batch_size, shuffle=True)
@@ -50,11 +59,11 @@ def main(devices = -1):
     updater = chapter4.model.DCGANUpdater(train_iter, {'opt_gen':optimizer_gen, 'opt_dis':optimizer_dis}, device=int(devices))
 
     # 機械学習の実行
-    trainer = chainer.training.Trainer(updater, (1000, 'epoch'), out='result')
+    trainer = chainer.training.Trainer(updater, (350, 'epoch'), out='result')
 
     trainer.extend(chainer.training.extensions.ProgressBar())
 
-    # 中韓結果の保存
+    # 中間結果の保存
     
     @chainer.training.make_extension(trigger=(1000, 'epoch'))
     def save_model(trainer):
@@ -77,4 +86,11 @@ if __name__ == '__main__':
     use_device = -1
     if len(sys.argv) >= 2:
         use_device = sys.argv[1]
-    main(use_device)
+
+    gen = ""
+    dis = ""
+    if len(sys.argv) >= 4:
+        gen = argv[2]
+        dis = argv[3]
+
+    main(use_device, gen, dis)
