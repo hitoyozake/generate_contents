@@ -10,6 +10,7 @@ except:
 
 class GoogleImageSpider(scrapy.Spider):
 
+
     name = "googleImageSpider"
     counter = 0
 
@@ -26,12 +27,20 @@ class GoogleImageSpider(scrapy.Spider):
             ar.append(s)
         return ar
 
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
+        super(GoogleImageSpider, self).__init__(*args, **kwargs)
+
         print('initialize')
         # もしもURLなどを初期化したいのならここで行う
         root = os.path.dirname(os.path.abspath(__file__)) + "/"
 
-        with open(root+"start_urls.json", encoding='utf-8') as f:
+        if 'json_name' in kwargs:
+            json_name = kwargs['json_name']
+        else:
+            raise BaseException("need json_name argment. please use command - scrapy crawl <spidername> -a jsonname=xxxx")
+
+
+        with open(root+"/json/"+json_name, encoding='utf-8') as f:
             jsdata = json.loads(f.read())
 
             if 'dir_name' in jsdata:

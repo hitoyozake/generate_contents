@@ -1,0 +1,13 @@
+{
+  "dir_name" : "dog",
+  "google":{
+    "start_urls": [
+      "https://www.google.com/search?q=犬+ヨークシャテリア&biw=1739&bih=1179&gbv=1&tbm=isch&ei=WjAEW7PjGsXM0gSe9awg&start=1&sa=N",
+      "https://www.google.com/search?q=犬+トイプードル&biw=1739&bih=1179&gbv=1&tbm=isch&ei=WjAEW7PjGsXM0gSe9awg&start=1&sa=N"
+    ],
+    "keywords": [
+        "柴犬",
+        "かわいい+犬"
+    ]
+    }
+}
