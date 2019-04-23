@@ -10,13 +10,18 @@ except:
 
 class GoogleImageSpider(scrapy.Spider):
 
+
     name = "googleImageSpider"
     counter = 0
 
     # allowed_domains = ["google.com", "https://encrypted-tbn0.gstatic.com"]
 
     start_urls = []
+<<<<<<< HEAD
     keywords = []
+=======
+    directory_name = 'imgs'
+>>>>>>> cfda7dd951c54baf7d5789c74c0d7d86015643bc
 
     def generate(self, keyword):
         ar = []
@@ -26,13 +31,24 @@ class GoogleImageSpider(scrapy.Spider):
             ar.append(s)
         return ar
 
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
+        super(GoogleImageSpider, self).__init__(*args, **kwargs)
+
         print('initialize')
         # もしもURLなどを初期化したいのならここで行う
         root = os.path.dirname(os.path.abspath(__file__)) + "/"
 
-        with open(root+"start_urls.json") as f:
+        if 'json_name' in kwargs:
+            json_name = kwargs['json_name']
+        else:
+            raise BaseException("need json_name argment. please use command - scrapy crawl <spidername> -a jsonname=xxxx")
+
+
+        with open(root+"/json/"+json_name, encoding='utf-8') as f:
             jsdata = json.loads(f.read())
+
+            if 'dir_name' in jsdata:
+                self.directory_name = jsdata['dir_name']
 
             for i in jsdata:
                 if 'start_urls' in jsdata[i]:
@@ -45,13 +61,14 @@ class GoogleImageSpider(scrapy.Spider):
                         for url in ar:
                             GoogleImageSpider.start_urls.append(url)
 
+
     def parse(self, response):
         item = GatherImagesItem()
         print("******PARSE*******")
         item["image_urls"] = []
 
         self.counter += 1
-        item["image_directory_name"]="dl"
+        item["image_directory_name"] = self.directory_name
         for url in response.xpath("//img/@src").extract():
             item['image_urls'].append(url)
 

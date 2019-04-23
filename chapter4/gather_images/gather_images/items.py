@@ -14,4 +14,5 @@ class GatherImagesItem(scrapy.Item):
     # Fieldは連想配列みたいなもの
     images = scrapy.Field()
     image_urls = scrapy.Field()
+    tag = scrapy.Field()
 
