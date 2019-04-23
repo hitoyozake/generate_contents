@@ -17,11 +17,8 @@ class GoogleImageSpider(scrapy.Spider):
     # allowed_domains = ["google.com", "https://encrypted-tbn0.gstatic.com"]
 
     start_urls = []
-<<<<<<< HEAD
     keywords = []
-=======
     directory_name = 'imgs'
->>>>>>> cfda7dd951c54baf7d5789c74c0d7d86015643bc
 
     def generate(self, keyword):
         ar = []
